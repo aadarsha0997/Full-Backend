@@ -1,6 +1,6 @@
 import prisma from "../config/db.js";
 
-const createUsers = async (req, res) => {
+const createUser = async (req, res) => {
 
     const { name, email, password } = req.body;
 
@@ -15,11 +15,50 @@ const createUsers = async (req, res) => {
     res.json(user);
 };
 
+//Get all fields of post of this user 
 
+// const getUser = async (req, res) => {
+//     const user = await prisma.user.findMany(
+//         {
+//             include: {
+//                 posts: true
+//             },
+//         }
+//     );
+//     res.json(user);
+// }
 const getUser = async (req, res) => {
-    const user = await prisma.user.findMany();
+    const user = await prisma.user.findMany(
+        {
+            select: {
+                _count: {
+                    select: {
+                        posts: true,
+                    }
+                }
+            }
+        }
+    );
     res.json(user);
 }
+
+
+// ######## get tiele and comment count of that post
+// const getUser = async (req, res) => {
+//     const user = await prisma.user.findMany(
+//         {
+//             include: {
+//                 posts: {
+//                     select: {
+//                         title: true,
+//                         comment_count: true,
+//                     }
+//                 }
+//             },
+//         }
+//     );
+//     res.json(user);
+// }
 
 const updateUser = async (req, res) => {
     const { id } = req.params;
@@ -63,7 +102,7 @@ const getUserById = async (req, res) => {
 
 export const userController = {
     getUser,
-    createUsers,
+    createUser,
     getUserById,
     updateUser,
     deleteUser,
