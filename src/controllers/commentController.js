@@ -12,6 +12,17 @@ const createComment = async (req, res) => {
         },
     });
 
+    await prisma.post.update({
+        where: {
+            id: Number(post_id),
+        },
+        data: {
+            comment_count: {
+                increment: 1,
+            }
+        }
+    });
+
     res.json(commentData);
 };
 
@@ -37,12 +48,23 @@ const updateComment = async (req, res) => {
 }
 
 const deleteComment = async (req, res) => {
+
     const { id } = req.params;
     const comment = await prisma.comment.delete({
         where: {
-            id: Number(id),
+            id: id,
         }
     })
+    await prisma.post.update({
+        where: {
+            id: Number(comment.post_id),
+        },
+        data: {
+            comment_count: {
+                decrement: 1,
+            }
+        }
+    });
     res.json({
         message: "Comment deleted successfully",
         comment

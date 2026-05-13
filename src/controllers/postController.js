@@ -17,8 +17,31 @@ const createPost = async (req, res) => {
 
 
 const getPost = async (req, res) => {
-    const post = await prisma.post.findMany();
-    res.json(post);
+
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 10;
+
+
+    if (page <= 0) {
+        page = 1;
+    }
+    if (limit <= 0 || limit >= 100) {
+        limit = 10;
+    }
+    const skip = (page - 1) * limit;
+
+    const post = await prisma.post.findMany({
+        skip: skip,
+        take: limit,
+    });
+    const totalPosts = await prisma.post.count();
+    const totalPages = Math.ceil(totalPosts / limit);
+    res.json({
+        post, meta: {
+            totalPages, currentPage: page,
+            limit: limit,
+        }
+    });
 }
 
 const updatePost = async (req, res) => {
