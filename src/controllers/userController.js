@@ -1,5 +1,7 @@
 import prisma from "../config/db.js";
 
+
+
 const createUser = async (req, res) => {
 
     const { name, email, password } = req.body;
@@ -60,6 +62,16 @@ const getUser = async (req, res) => {
 //     res.json(user);
 // }
 
+const getUserById = async (req, res) => {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({
+        where: {
+            id: Number(id),
+        },
+    })
+    res.json(user);
+}
+
 const updateUser = async (req, res) => {
     const { id } = req.params;
     const { name, email, password } = req.body;
@@ -88,16 +100,6 @@ const deleteUser = async (req, res) => {
         message: "User deleted successfully",
         user
     });
-}
-
-const getUserById = async (req, res) => {
-    const { id } = req.params;
-    const user = await prisma.user.findUnique({
-        where: {
-            id: Number(id),
-        },
-    })
-    res.json(user);
 }
 
 export const userController = {
